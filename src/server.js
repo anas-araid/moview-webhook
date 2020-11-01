@@ -1,16 +1,17 @@
 'use strict';
-
+// importo dialogflow
 const {WebhookClient} = require('dialogflow-fulfillment');
+// importo express e altre cose
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-
-const handlers = require('../src/api/handler.js');
+// importo il modulo handlers con dentro le funzioni per gli intent
+const handlers = require('../src/api/handlers.js');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-function WebhookProcessing(req, res) {
+function Webhook(req, res) {
   const agent = new WebhookClient({request: req, response: res});
   console.log("asdf");
   console.log('----------------------')
@@ -21,12 +22,13 @@ function WebhookProcessing(req, res) {
   agent.handleRequest(intentMap);
 }
 
-// Webhook
+// root del server
 app.post('/', function (req, res) {
-  console.info("asdf");
-  WebhookProcessing(req, res);
+  console.log("asdf");
+  // passo la richiesta alla funzione webhook
+  Webhook(req, res);
 });
-
+// server in ascolto sulla porta 8080
 app.listen(8080, function () {
-  console.info("listening on port 8080")
+  console.log("listening on port 8080")
 });

@@ -11,7 +11,10 @@
 - node_modules --------(librerie) 
 - src
   - api
-    - api.js ---------(api che comunica con the movie db)
-  - index.js -----------(bot telegram)
-- .env --------------------(contiene il token del bot)
+    - handlers.js ---------(funzioni con intent)
+    - movieControllers.js ---------(funzioni che comunicano con tmdb)
+  - bot
+    - index.js -----------(bot telegram) -> non serve più
+  - server.js
+- .env --------------------(variabili d'ambiente)
 - .package.json ----------(configurazioni varie)
