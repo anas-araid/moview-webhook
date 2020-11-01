@@ -13,8 +13,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 function Webhook(req, res) {
   const agent = new WebhookClient({request: req, response: res});
-  console.log("asdf");
-  console.log('----------------------')
   const action = agent.action;
   let intentMap = new Map();
   intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
@@ -24,7 +22,7 @@ function Webhook(req, res) {
 
 // root del server
 app.post('/', function (req, res) {
-  console.log("asdf");
+  console.log('webhook')
   // passo la richiesta alla funzione webhook
   Webhook(req, res);
 });
