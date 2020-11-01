@@ -16,14 +16,12 @@ intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
 intentMap.set('Default Fallback Intent', handlers.fallbackHandler);
 
 function Webhook(req, res) {
-  const agent = new WebhookClient({request: req, response: res});
-  const action = agent.action;
+  const agent = new WebhookClient({request:req,response:res});
   agent.handleRequest(intentMap);
 }
 
 // root del server
 app.post('/', function (req, res) {
-  console.log('webhook')
   // passo la richiesta alla funzione webhook
   Webhook(req, res);
 });
