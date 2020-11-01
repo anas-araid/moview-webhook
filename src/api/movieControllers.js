@@ -1,3 +1,5 @@
+'use strict';
+
 const axios = require('axios');
 require('dotenv').config();
 
@@ -10,6 +12,9 @@ module.exports = {
 
   },
   getMovieByKeyword : function(keyword){
+
+  },
+  getMovieByDuration : function(duration){
 
   }
   // ECC.

@@ -4,8 +4,8 @@
 2. eseguire il comando **npm install**
 3. per far partire il progetto eseguire **node src/index.js** oppure **npm run start**
 ###### Facoltativo
-4. utilizzare ngrok per avere il server temporaneamente online
-6. copiare l'url di ngrok in "webhook" nella sezione Fulfillment di Dialogflow
+4. utilizzare ngrok per avere il server temporaneamente online (**ngrok http 8080**)
+6. copiare l'url di ngrok (la versione https) in "webhook" nella sezione Fulfillment di Dialogflow
 7. Per ogni intent in dialogflow attivare il toggle "Enable webhook call for this intent"
 
 ## struttura
