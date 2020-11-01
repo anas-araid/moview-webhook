@@ -11,12 +11,13 @@ const handlers = require('../src/api/handlers.js');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+const intentMap = new Map();
+intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
+intentMap.set('Default Fallback Intent', handlers.fallbackHandler);
+
 function Webhook(req, res) {
   const agent = new WebhookClient({request: req, response: res});
   const action = agent.action;
-  let intentMap = new Map();
-  intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
-  intentMap.set('Default Fallback Intent', handlers.fallbackHandler);
   agent.handleRequest(intentMap);
 }
 
