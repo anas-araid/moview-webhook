@@ -10,7 +10,11 @@
   "author": "Anas Araid",
   "license": "ISC",
   "dependencies": {
+    "actions-on-google": "^2.13.0",
+    "body-parser": "^1.19.0",
+    "dialogflow-fulfillment": "^0.6.1",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "node-telegram-bot-api": "^0.50.0"
   }
 }
