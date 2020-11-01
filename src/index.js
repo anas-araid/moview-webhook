@@ -22,8 +22,9 @@ bot.onText(/\/start/, (msg, match) => {
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   console.log(msg)
-  if (null){
-
+  // se è /start non deve fare niente
+  if (msg.text === '/start'){
+    return;
   }
   bot.sendMessage(chatId, 'Cazzo vuoi che devi configurare Dialogflow');
 });
