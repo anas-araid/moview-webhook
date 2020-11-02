@@ -1,5 +1,7 @@
 'use strict';
 const movieController = require('../api/movieControllers.js');
+const {WebhookClient} = require('dialogflow-fulfillment');
+const {Payload} = require('dialogflow-fulfillment');
 
 module.exports = {
   welcomeHandler : function(agent){
@@ -11,14 +13,9 @@ module.exports = {
     agent.add("I'm sorry, can you try again?");
   },
   startHandler : function(agent) {
-    //console.log(agent)
-    //console.log(agent.consoleMessages[0].payload)
-    //console.log("--------------------------------------------------")
-    //console.log(agent.originalRequest.payload.data)
-    //agent.add(agent.consoleMessages[0].payload.telegram);
-    agent.add("You talkin’ to me?");
-    agent.add("Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: give me an action movie from the 80s with Stallone")
-    agent.add("DIO CANE FUNZIONA");
+    agent.add(new Payload(agent.TELEGRAM, {"text": "<i>You talkin’ to me?</i>\nDo you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}))
+    // Finchè non sistemano la libreria non si possono mandare due payload contemporaneamente
+    //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   }
   /*
   ########################################################################
