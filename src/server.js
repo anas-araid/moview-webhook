@@ -14,9 +14,18 @@ app.use(bodyParser.urlencoded({extended: true}));
 const intentMap = new Map();
 intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
 intentMap.set('Default Fallback Intent', handlers.fallbackHandler);
+intentMap.set('start', handlers.startHandler);
 
 function Webhook(req, res) {
+  if (!req.body.queryResult.fulfillmentMessages)
+    return;
+    req.body.queryResult.fulfillmentMessages = req.body.queryResult.fulfillmentMessages.map(m => {
+      if (!m.platform)
+        m.platform = 'PLATFORM_UNSPECIFIED';
+      return m;
+  });
   const agent = new WebhookClient({request:req,response:res});
+  // agent.originalRequest.payload.data = dati dell'utente telegram
   agent.handleRequest(intentMap);
 }
 
