@@ -15,6 +15,7 @@ const intentMap = new Map();
 intentMap.set('Default Welcome Intent', handlers.welcomeHandler);
 intentMap.set('Default Fallback Intent', handlers.fallbackHandler);
 intentMap.set('start', handlers.startHandler);
+intentMap.set('movie_request', handlers.movieRequestHandler);
 
 function Webhook(req, res) {
   if (!req.body.queryResult.fulfillmentMessages)
