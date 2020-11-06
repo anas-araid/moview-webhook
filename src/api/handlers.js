@@ -17,7 +17,7 @@ module.exports = {
     // Finchè non sistemano la libreria non si possono mandare due payload contemporaneamente
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
-  movieRequestHandler : function(agent){
+  movieRandomHandler : function(agent){
     return movieController.getRandomMovie().then(res => {
       let result = res.data.results;
       if (result.length !== 0){
@@ -29,7 +29,7 @@ module.exports = {
         const card = new Card({
           title: '📽️ ' + selectedMovie.title,
           text: '\n🌟 ' + selectedMovie.vote_average+ '/10 \n📆 '+ releaseDate.getFullYear() +' \n📔 ' + selectedMovie.overview,
-          imageUrl: 'https://image.tmdb.org/t/p/w200'+selectedMovie.backdrop_path,
+          imageUrl: 'https://image.tmdb.org/t/p/w200'+selectedMovie.poster_path,
           platform: 'TELEGRAM'
         });
         agent.add(card);

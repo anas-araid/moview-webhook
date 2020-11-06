@@ -28,5 +28,5 @@ bot.on('message', (msg) => {
   if (msg.text === '/start'){
     return;
   }
-  bot.sendMessage(chatId, 'Cazzo vuoi che devi configurare Dialogflow');
+  bot.sendMessage(chatId, 'Ciao mondo!');
 });

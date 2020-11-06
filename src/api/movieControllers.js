@@ -12,7 +12,7 @@ module.exports = {
     // random tra 1 e 5
     let randomPage = Math.floor((Math.random() * 5) + 1);
     // restituisce una serie di film con un anno a caso e la pagina a caso 
-    let query = 'https://api.themoviedb.org/3/discover/movie?api_key='+TMDB_KEY+'&language=en-US&sort_by=popularity.desc&year='+randomYear+'&page='+randomPage;
+    let query = 'https://api.themoviedb.org/3/discover/movie?api_key='+TMDB_KEY+'&language=en-US&sort_by=popularity.desc&vote_count.gte=500&year='+randomYear+'&page='+randomPage;
     return axios.get(query);
   },
   getMovieByGenre : function(genre){
