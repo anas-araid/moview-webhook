@@ -6,6 +6,7 @@ const { query } = require("express");
 const TMDB_KEY = process.env.TMDB_KEY;
 
 module.exports = {
+  // restituisce un film casuale
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente
     let fistYear = 1935;
@@ -24,6 +25,7 @@ module.exports = {
       randomPage;
     return axios.get(query);
   },
+  //restituisce i dettagli di un attore/regista 
   getPerson: function (params) {
     return axios.get(
       "https://api.themoviedb.org/3/search/person?api_key=" +
@@ -32,6 +34,7 @@ module.exports = {
         params
     );
   },
+  // restituisce le keyword in base al parametro passato
   getKeyword: function (params) {
     return axios.get(
       "https://api.themoviedb.org/3/search/keyword?api_key=" +
@@ -40,6 +43,7 @@ module.exports = {
         params
     );
   },
+  // esegue la query costruita nella funzione handleParameters
   getMovie: async function (params) {
     let query = await this.handleParameters(params);
     return axios.get(
@@ -49,8 +53,10 @@ module.exports = {
         query
     );
   },
+  // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
     var actors = "&with_cast=";
+    // per ogni attore richiede il suo l'id dall'api (serve poi per costruire la query)
     for (let i = 0; i < params.actor.length; i++) {
       await this.getPerson(params.actor[i].name)
         .then((res) => {
@@ -60,6 +66,7 @@ module.exports = {
           console.error(err);
         });
     }
+    // se non ci sono attori, rimuove il carattere '=' dalla stringa
     if (actors.charAt(actors.length - 1) !== "=") {
       actors = actors.slice(0, -1);
     }
@@ -71,8 +78,7 @@ module.exports = {
       .catch((err) => {
         console.error(err);
       });
-
-    console.log(director);
+    console.log("linea 81 - director: " + director);
     var keywords = "&with_keywords=";
     for (let i = 0; i < params.keywords_1.length; i++) {
       await this.getKeyword(params.keywords_1[i])
@@ -80,12 +86,9 @@ module.exports = {
           let kw = res.data.results.filter(function (value) {
             return value.name == params.keywords_1[i];
           });
-
           if (kw.length !== 0) {
             keywords += kw[0].id + ",";
           }
-
-          console.log(res.data);
         })
         .catch((err) => {
           console.error(err);
@@ -94,8 +97,8 @@ module.exports = {
     if (keywords.charAt(keywords.length - 1) !== "=") {
       keywords = keywords.slice(0, -1);
     }
-    console.log(keywords);
     var query = actors + keywords + director;
+    console.log("linea 101 - query: " + query);
     return query;
   },
   getMovieByYear: function (year) {
@@ -106,7 +109,6 @@ module.exports = {
       year;
     return axios.get(query);
   },
-  getMovieByKeyword: function (keyword) {},
   getMovieByDuration: function (duration) {},
   // ECC.
 };

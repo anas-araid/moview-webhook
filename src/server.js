@@ -19,10 +19,10 @@ intentMap.set("movie_request", handlers.movieRequestHandler);
 intentMap.set("movie_request - repeat_no", handlers.movieRequestRepeatNo);
 intentMap.set("movie_request - custom", handlers.movieRequestCustom);
 intentMap.set("movie_request - yes", handlers.movieRequestYes);
-
 //intentMap.set("movie_random", handlers.movieRandomHandler);
 
 function Webhook(req, res) {
+  // se il platform non è specificato, evita il crash del webhook
   if (!req.body.queryResult.fulfillmentMessages) return;
   req.body.queryResult.fulfillmentMessages = req.body.queryResult.fulfillmentMessages.map(
     (m) => {

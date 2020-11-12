@@ -45,9 +45,9 @@ Se ci sono problemi scrivetemi su [telegram](https://t.me/asdf1899).
 
 ## to-do
 
-- Funzioni che comunicano con tmdb (movieControllers.js)
-- aggiungere altri intent in handlers.js
 - capire come inviare più immagini in una sola volta
-- dentro handlers, per ogni intent aggiungere la lista delle risposte ed inviare una a caso (handlers.js) 
+- dentro handlers, per ogni intent aggiungere la lista delle risposte (citazioni) ed inviare una a caso (handlers.js)
+- controllare che l'immagine ricevuta dall'api di tmdb non sia *null*
+- aggiungere la durata del film nella response
 
 Visto che la documentazione di dialogflow fa pena, conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src)

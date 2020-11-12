@@ -1,8 +1,7 @@
 "use strict";
 const movieController = require("../api/movieControllers.js");
-const { WebhookClient } = require("dialogflow-fulfillment");
-const { Payload, Card } = require("dialogflow-fulfillment");
-const { ContextValues } = require("actions-on-google/dist/service/dialogflow");
+const { WebhookClient, Payload, Card } = require("dialogflow-fulfillment");
+//const { ContextValues } = require("actions-on-google/dist/service/dialogflow");
 
 module.exports = {
   welcomeHandler: function (agent) {
@@ -27,15 +26,13 @@ module.exports = {
         { sendAsMessage: true }
       )
     );
-    // Finchè non sistemano la libreria non si possono mandare due payload contemporaneamente
+    // Finchè google non sistema la libreria non si possono mandare due payload contemporaneamente
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: function (agent) {
     return movieController.getMovie(agent.parameters).then((res) => {
-      console.log(
-        "#####################################################################################à"
-      );
-      console.log(res.data);
+      console.log("linea 35 - res.data:");
+      console.log(res.data)
       if (res.data.results.length !== 0) {
         let film = res.data.results[0];
         let releaseDate = new Date(Date.parse(film.release_date));
@@ -48,7 +45,7 @@ module.exports = {
             releaseDate.getFullYear() +
             " \n📔 " +
             film.overview,
-          imageUrl: "https://image.tmdb.org/t/p/w200" + film.poster_path,
+          imageUrl: "https://image.tmdb.org/t/p/w400" + film.poster_path,
           platform: "TELEGRAM",
         });
         agent.add(card);
@@ -64,13 +61,6 @@ module.exports = {
         agent.add("Try again😔");
       }
     });
-    // console.log(agent);
-    //console.log(agent.context.get("movie_request-followup").parameters);
-    console.log(agent.parameters);
-
-    //console.log(agent.context.get("movie_request-followup").parameters);
-
-    agent.add("movie request fatta!");
   },
   movieRequestRepeatNo: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
@@ -79,7 +69,6 @@ module.exports = {
     console.log(agent.context.get("movie_request-followup").parameters);
     agent.add("movie request non soddisfa l'utente! Altri film!!!!");
   },
-
   movieRequestYes: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
       agent.add("fuori contesto yes");
@@ -87,16 +76,11 @@ module.exports = {
     console.log(agent.context.get("movie_request-followup").parameters);
     agent.add("movie request soddisfa l'utente!");
   },
-
   movieRequestCustom: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
       agent.add("fuori contesto custom!");
     }
-
     console.log(agent.context.get("movie_request-followup").parameters);
-
-    // if (agent.getContext("movie_request - custom") === null) return;
-
     agent.add("l'utente vuole altri filtri!");
   },
   // movieRandomHandler: function (agent) {
