@@ -2,6 +2,7 @@
 const movieController = require("../api/movieControllers.js");
 const { WebhookClient } = require("dialogflow-fulfillment");
 const { Payload, Card } = require("dialogflow-fulfillment");
+const { ContextValues } = require("actions-on-google/dist/service/dialogflow");
 
 module.exports = {
   welcomeHandler: function (agent) {
@@ -30,8 +31,35 @@ module.exports = {
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: function (agent) {
-    console.log(agent);
-    agent.add("prova");
+    // console.log(agent);
+    agent.add("movie request fatta!");
+  },
+  movieRequestRepeatNo: function (agent) {
+    if (agent.context.get("movie_request-followup") === null) {
+      agent.add("fuori contesto repeat no!");
+    }
+    console.log(agent.context.get("movie_request-followup").parameters);
+    agent.add("movie request non soddisfa l'utente! Altri film!!!!");
+  },
+
+  movieRequestYes: function (agent) {
+    if (agent.context.get("movie_request-followup") === null) {
+      agent.add("fuori contesto yes");
+    }
+    console.log(agent.context.get("movie_request-followup").parameters);
+    agent.add("movie request soddisfa l'utente!");
+  },
+
+  movieRequestCustom: function (agent) {
+    if (agent.context.get("movie_request-followup") === null) {
+      agent.add("fuori contesto custom!");
+    }
+
+    console.log(agent.context.get("movie_request-followup").parameters);
+
+    // if (agent.getContext("movie_request - custom") === null) return;
+
+    agent.add("l'utente vuole altri filtri!");
   },
   // movieRandomHandler: function (agent) {
   //   return movieController.getRandomMovie().then((res) => {
