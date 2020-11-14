@@ -43,9 +43,16 @@ module.exports = {
         params
     );
   },
-  // esegue la query costruita nella funzione handleParameters
+  getGenres: function () {
+    return axios.get(
+      "https://api.themoviedb.org/3/genre/movie/list?api_key=" +
+        TMDB_KEY +
+        "&language=en-US"
+    );
+  },
   getMovie: async function (params) {
     let query = await this.handleParameters(params);
+
     return axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=" +
         TMDB_KEY +
@@ -55,6 +62,7 @@ module.exports = {
   },
   // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
+    console.log(params);
     var actors = "&with_cast=";
     // per ogni attore richiede il suo l'id dall'api (serve poi per costruire la query)
     for (let i = 0; i < params.actor.length; i++) {
@@ -71,14 +79,18 @@ module.exports = {
       actors = actors.slice(0, -1);
     }
     var director = "&with_crew=";
-    await this.getPerson(params.director.name)
-      .then((res) => {
-        director += res.data.results[0].id;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    console.log("linea 81 - director: " + director);
+    if (params.director !== "") {
+      await this.getPerson(params.director.name)
+        .then((res) => {
+          if (res.data.results[0].known_for_department == "Directing") {
+            director += res.data.results[0].id;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+
     var keywords = "&with_keywords=";
     for (let i = 0; i < params.keywords_1.length; i++) {
       await this.getKeyword(params.keywords_1[i])
@@ -97,18 +109,81 @@ module.exports = {
     if (keywords.charAt(keywords.length - 1) !== "=") {
       keywords = keywords.slice(0, -1);
     }
-    var query = actors + keywords + director;
-    console.log("linea 101 - query: " + query);
+    var genres = "&with_genres=";
+    await this.getGenres()
+      .then((res) => {
+        for (let i = 0; i < params.genre.length; i++) {
+          var genreName =
+            params.genre[i].charAt(0).toUpperCase() +
+            params.genre[i].substring(1);
+          for (let x = 0; x < res.data.genres.length; x++) {
+            if (genreName === res.data.genres[x].name) {
+              genres += res.data.genres[x].id + ",";
+            }
+          }
+        }
+        if (genres.charAt(genres.length - 1) !== "=") {
+          genres = genres.slice(0, -1);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    console.log(genres);
+    var query = actors + keywords + director + genres;
+
     return query;
   },
-  getMovieByYear: function (year) {
-    let query =
-      "https://api.themoviedb.org/3/discover/movie?api_key=" +
-      TMDB_KEY +
-      "&year=" +
-      year;
-    return axios.get(query);
+  getMovieCredits: function (id) {
+    return axios.get(
+      "https://api.themoviedb.org/3/movie/" +
+        id +
+        "/credits?api_key=" +
+        TMDB_KEY
+    );
   },
-  getMovieByDuration: function (duration) {},
+  checkDirectors: async function (res, agent) {
+    var results = [];
+    var len = res.data.results.length > 5 ? 5 : res.data.results.length;
+    let counter = 0;
+    while (results.length != len) {
+      if (counter == len) {
+        break;
+      } else {
+        await this.getMovieCredits(res.data.results[counter].id)
+          .then((response) => {
+            console.log(response.data.id);
+            for (let i = 0; i < response.data.crew.length; i++) {
+              if (
+                response.data.crew[i].job == "Director" &&
+                response.data.crew[i].name
+                  .toLowerCase()
+                  .includes(agent.parameters.director.name)
+              ) {
+                console.log(response.data.crew[i].name + " is the director!!!");
+                results.push(res.data.results[counter]);
+                break;
+              }
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+      counter++;
+    }
+    console.log(results);
+    return results;
+  },
+  // getMovieByYear: function (year) {
+  //   let query =
+  //     "https://api.themoviedb.org/3/discover/movie?api_key=" +
+  //     TMDB_KEY +
+  //     "&year=" +
+  //     year;
+  //   return axios.get(query);
+  // },
+  // getMovieByKeyword: function (keyword) {},
+  // getMovieByDuration: function (duration) {},
   // ECC.
 };
