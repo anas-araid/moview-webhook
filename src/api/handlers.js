@@ -35,9 +35,21 @@ module.exports = {
       console.log(
         "#####################################################################################à"
       );
-      console.log(res.data);
-      if (res.data.results.length !== 0) {
-        let film = res.data.results[0];
+
+      var results = [];
+      var len = res.data.results.length > 5 ? 5 : res.data.results.length;
+
+      if (agent.parameters.director === "") {
+        for (let i = 0; i < len; i++) {
+          results.push(res.data.results[i]);
+        }
+      } else {
+        results = movieController.checkDirectors(res, agent);
+      }
+      console.log(results);
+
+      if (results.length !== 0) {
+        let film = results[0];
         let releaseDate = new Date(Date.parse(film.release_date));
         const card = new Card({
           title: "📽️ " + film.title,
@@ -72,6 +84,7 @@ module.exports = {
 
     agent.add("movie request fatta!");
   },
+
   movieRequestRepeatNo: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
       agent.add("fuori contesto repeat no!");
