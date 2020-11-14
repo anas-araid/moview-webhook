@@ -29,21 +29,21 @@ module.exports = {
     // Finchè google non sistema la libreria non si possono mandare due payload contemporaneamente
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
-  movieRequestHandler: function (agent) {
-    return movieController.getMovie(agent.parameters).then((res) => {
+  movieRequestHandler: async function (agent) {
+    return await movieController.getMovie(agent.parameters).then( async (res) => {
       console.log(
         "#####################################################################################à"
       );
 
       var results = [];
       var len = res.data.results.length > 5 ? 5 : res.data.results.length;
-
-      if (agent.parameters.director === "") {
+      console.log(agent.parameters);
+      if (typeof agent.parameters.director === "string" ){
         for (let i = 0; i < len; i++) {
           results.push(res.data.results[i]);
         }
       } else {
-        results = movieController.checkDirectors(res, agent);
+        results = await movieController.checkDirectors(res, agent);
       }
       console.log(results);
 

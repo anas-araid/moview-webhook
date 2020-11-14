@@ -172,7 +172,7 @@ module.exports = {
       }
       counter++;
     }
-    console.log(results);
+    //console.log(results);
     return results;
   },
   // getMovieByYear: function (year) {
