@@ -4,6 +4,8 @@ const { WebhookClient } = require("dialogflow-fulfillment");
 // importo express e altre cose
 const express = require("express");
 const bodyParser = require("body-parser");
+require("dotenv").config();
+
 const app = express();
 // importo il modulo handlers con dentro le funzioni per gli intent
 const handlers = require("../src/api/handlers.js");
@@ -41,6 +43,6 @@ app.post("/", function (req, res) {
   Webhook(req, res);
 });
 // server in ascolto sulla porta 8080
-app.listen(8080, function () {
+app.listen(process.env.PORT, function () {
   console.log("listening on port 8080");
 });
