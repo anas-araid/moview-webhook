@@ -25,7 +25,7 @@ module.exports = {
       randomPage;
     return axios.get(query);
   },
-  //restituisce i dettagli di un attore/regista 
+  //restituisce i dettagli di un attore/regista
   getPerson: function (params) {
     return axios.get(
       "https://api.themoviedb.org/3/search/person?api_key=" +
@@ -130,8 +130,10 @@ module.exports = {
         console.error(err);
       });
     console.log(genres);
-    var query = actors + keywords + director + genres;
+    var year = "&primary_release_year=" + params.year;
 
+    var query = actors + keywords + director + genres + year;
+    console.log(query);
     return query;
   },
   getMovieCredits: function (id) {

@@ -44,5 +44,5 @@ app.post("/", function (req, res) {
 });
 // server in ascolto sulla porta 8080
 app.listen(process.env.PORT, function () {
-  console.log("listening on port 8080");
+  console.log("listening on port " + process.env.PORT);
 });
