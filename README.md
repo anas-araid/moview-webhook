@@ -1,8 +1,8 @@
 # moview
 
-1. clonare il progetto **https://github.com/asdf1899/moview-webhook.git**
+1. scaricare o clonare il progetto **https://github.com/asdf1899/moview-webhook.git**
 2. nella root del progetto creare un file .env
-3. dentro il file .env aggiungere l'api key di tmdb (in questo modo **TMDB_KEY=api_key_di_tmdb**)
+3. dentro il file .env aggiungere l'api key di tmdb (in questo modo **TMDB_KEY=api_key_di_tmdb**) e la porta di rete (**PORT=8080**)
 4. eseguire il comando **npm install**
 5. creare un branch col tuo nome es. *moview_mario*
 6. per far partire il progetto eseguire **node src/index.js** oppure **npm run start**
@@ -12,7 +12,7 @@
 6. rendi il server temporaneamente online (**ngrok http 8080**)
 7. copiare l'url di ngrok (la versione https) in "webhook" nella sezione Fulfillment di Dialogflow
 
-## struttura
+## structure
 
 - node_modules -----------------------(librerie) 
 - src
@@ -41,8 +41,6 @@ Premessa: non lavorare direttamente nel branch main, ma nel tuo branch *moview_n
 
 <br>
 
-Se ci sono problemi scrivetemi su [telegram](https://t.me/asdf1899).
-
 ## to-do
 
 - capire come inviare più immagini in una sola volta
@@ -50,4 +48,10 @@ Se ci sono problemi scrivetemi su [telegram](https://t.me/asdf1899).
 - controllare che l'immagine ricevuta dall'api di tmdb non sia *null*
 - aggiungere la durata del film nella response
 
-Visto che la documentazione di dialogflow fa pena, conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src)
+Visto che no c'è documentazione per dialogflow fullfillment (nodejs), conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src) su Github
+
+
+
+<br>
+
+Se ci sono problemi scrivetemi su [telegram](https://t.me/asdf1899).
