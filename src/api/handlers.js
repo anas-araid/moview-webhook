@@ -30,51 +30,59 @@ module.exports = {
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: async function (agent) {
-    return await movieController.getMovie(agent.parameters).then( async (res) => {
-      console.log(
-        "#####################################################################################à"
-      );
-
-      var results = [];
-      var len = res.data.results.length > 5 ? 5 : res.data.results.length;
-      console.log(agent.parameters);
-      if (typeof agent.parameters.director === "string" ){
-        for (let i = 0; i < len; i++) {
-          results.push(res.data.results[i]);
-        }
-      } else {
-        results = await movieController.checkDirectors(res, agent);
-      }
-      console.log(results);
-
-      if (results.length !== 0) {
-        let film = results[0];
-        let releaseDate = new Date(Date.parse(film.release_date));
-        const card = new Card({
-          title: "📽️ " + film.title,
-          text:
-            "\n🌟 " +
-            film.vote_average +
-            "/10 \n📆 " +
-            releaseDate.getFullYear() +
-            " \n📔 " +
-            film.overview,
-          imageUrl: "https://image.tmdb.org/t/p/w400" + film.poster_path,
-          platform: "TELEGRAM",
-        });
-        agent.add(card);
-      } else {
-        // bisognerebbe far partire qualche fallback (con frasi a caso)
-        agent.add(
-          new Payload(
-            agent.TELEGRAM,
-            { text: "<i>Houston, we have a problem.</i>", parse_mode: "html" },
-            { sendAsMessage: true }
-          )
+    return await movieController
+      .getMovie(agent.parameters)
+      .then(async (res) => {
+        console.log(
+          "#####################################################################################à"
         );
-        agent.add("Try again😔");
-      }
-    });
+
+        var results = [];
+        var len = res.data.results.length > 5 ? 5 : res.data.results.length;
+        console.log(agent.parameters);
+        if (typeof agent.parameters.director === "string") {
+          for (let i = 0; i < len; i++) {
+            results.push(res.data.results[i]);
+          }
+        } else {
+          results = await movieController.checkDirectors(res, agent);
+        }
+        console.log(results);
+
+        if (results.length !== 0) {
+          let film = results[0];
+          let releaseDate = new Date(Date.parse(film.release_date));
+          const card = new Card({
+            title: "📽️ " + film.title,
+            text:
+              "\n🌟 " +
+              film.vote_average +
+              "/10 \n📆 " +
+              releaseDate.getFullYear() +
+              " \n📔 " +
+              film.overview,
+            imageUrl: "https://image.tmdb.org/t/p/w400" + film.poster_path,
+            platform: "TELEGRAM",
+          });
+          agent.add(card);
+          // for (let i = 0; i < results.length; i++) {
+          //   agent.add(results[i].title);
+          // }
+        } else {
+          // bisognerebbe far partire qualche fallback (con frasi a caso)
+          agent.add(
+            new Payload(
+              agent.TELEGRAM,
+              {
+                text: "<i>Houston, we have a problem.</i>",
+                parse_mode: "html",
+              },
+              { sendAsMessage: true }
+            )
+          );
+          agent.add("Try again😔");
+        }
+      });
   },
 
   movieRequestRepeatNo: function (agent) {

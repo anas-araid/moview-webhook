@@ -129,10 +129,18 @@ module.exports = {
       .catch((err) => {
         console.error(err);
       });
-    console.log(genres);
     var year = "&primary_release_year=" + params.year;
+    var decadeFrom = "&primary_release_date.gte=";
+    var decadeTo = "&primary_release_date.lte=";
+    if (typeof params["date-period"] === "object") {
+      let date1 = params["date-period"].startDate.slice(0, 10);
+      let date2 = params["date-period"].endDate.slice(0, 10);
+      decadeFrom += date1;
+      decadeTo += date2;
+    }
+    var decade = decadeFrom + decadeTo;
 
-    var query = actors + keywords + director + genres + year;
+    var query = actors + keywords + director + genres + year + decade;
     console.log(query);
     return query;
   },
