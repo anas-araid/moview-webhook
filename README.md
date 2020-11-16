@@ -41,6 +41,20 @@ Premessa: non lavorare direttamente nel branch main, ma nel tuo branch *moview_n
 
 <br>
 
+## deployment
+
+Per pubblicare il progetto su heroku è consigliato utilizzare un branch a parte (per es. production), dove il codice è 'pulito' e non ci sono console.log() o altro codice che potrebbe 'sporcare' la console.
+
+Se si è stati aggiunti come contributor in heroku, per pubblicare una nuova versione del progetto:
+- spostarsi su un branch production
+- fare il merge delle modifiche
+- sistemare il codice (togliere i console.log() ecc.)
+- da terminale eseguire il comando *heroku login* (verrai reindirizzato sul tuo browser per fare il login)
+- poi *heroku git:remote -a moviewbot*
+- ed infine *git push heroku production:main* (utilizzare branch:main se si vuole pushare da un branch diverso da main in locale a main su heroku)
+I log del server si possono consulare o sulla dashboard di heroku sul sito, oppure direttamente dal terminale, utilizzando il comando *heroku logs --tail*
+
+
 ## to-do
 
 - capire come inviare più immagini in una sola volta
