@@ -3,9 +3,14 @@
 require("dotenv").config();
 const axios = require("axios");
 const { query } = require("express");
+var fs = require('fs');
+
 const TMDB_KEY = process.env.TMDB_KEY;
+// contiene tutti i generi da tmdb
+const GENRES = JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8'));
 
 module.exports = {
+  GENRES: GENRES,
   // restituisce un film casuale
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente

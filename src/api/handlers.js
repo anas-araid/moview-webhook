@@ -34,6 +34,7 @@ module.exports = {
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: async function (agent) {
+    console.log(movieController.GENRES)
     return await movieController
       .getMovie(agent.context.get("movie_request-followup").parameters)
       .then(async (res) => {
@@ -70,17 +71,26 @@ module.exports = {
                 .name
             );
           }
-          console.log(res.data.results);
-          console.log(random);
+          console.log(film);
+          // cardGenres contiene i generi del film selezionato
+          let cardGenres = '';
+          for (let j=0; j < film.genre_ids.length; j++){
+            movieController.GENRES.forEach( (genre) => {
+              if (genre.id === film.genre_ids[j]){
+                cardGenres += genre.name + "|"
+              }
+           })
+          }
+          // rimuovo l'ultimo |
+          cardGenres = cardGenres.slice(0, -1);
           let releaseDate = new Date(Date.parse(film.release_date));
           const card = new Card({
             title: "📽️ " + film.title,
             text:
-              "\n🌟 " +
-              film.vote_average +
-              "/10 \n📆 " +
-              releaseDate.getFullYear() +
-              " \n📔 " +
+              "\n📆 " + releaseDate.getFullYear() +
+              "\n🎬 " + cardGenres + 
+              "\n🌟 " + film.vote_average + "/10 "+
+              "\n📔 " +
               film.overview,
             imageUrl: "https://image.tmdb.org/t/p/w200" + film.poster_path,
             platform: "TELEGRAM",
