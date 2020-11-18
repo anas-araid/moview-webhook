@@ -52,7 +52,6 @@ module.exports = {
   },
   getMovie: async function (params) {
     let query = await this.handleParameters(params);
-
     return axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=" +
         TMDB_KEY +

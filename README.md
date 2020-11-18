@@ -61,8 +61,9 @@ I log del server si possono consulare o sulla dashboard di heroku sul sito, oppu
 - dentro handlers, per ogni intent aggiungere la lista delle risposte (citazioni) ed inviare una a caso (handlers.js)
 - controllare che l'immagine ricevuta dall'api di tmdb non sia *null*
 - aggiungere la durata del film nella response
+- aggiungere il test del help
 
-Visto che no c'è documentazione per dialogflow fullfillment (nodejs), conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src) su Github
+Visto che non c'è documentazione per dialogflow fullfillment (nodejs), conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src) su Github
 
 
 

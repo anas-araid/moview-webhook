@@ -10,8 +10,9 @@ module.exports = {
     );
   },
   fallbackHandler: function (agent) {
-    agent.add("I didn't understand");
-    agent.add("I'm sorry, can you try again?");
+    agent.add(agent.request_.body.queryResult.fulfillmentText);
+    // agent.add("I didn't understand");
+    // agent.add("I'm sorry, can you try again?");
   },
   startHandler: function (agent) {
     agent.add(
