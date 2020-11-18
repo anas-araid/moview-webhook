@@ -1,6 +1,11 @@
 "use strict";
 const movieController = require("../api/movieControllers.js");
-const { WebhookClient, Payload, Card } = require("dialogflow-fulfillment");
+const {
+  WebhookClient,
+  Payload,
+  Card,
+  Image,
+} = require("dialogflow-fulfillment");
 //const { ContextValues } = require("actions-on-google/dist/service/dialogflow");
 
 module.exports = {
@@ -20,7 +25,13 @@ module.exports = {
         agent.TELEGRAM,
         {
           text:
-            "<i>You talkin’ to me?</i>\nDo you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>",
+            "<i>" +
+            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
+              .greeting +
+            "</i>\nDo you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>" +
+            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
+              .example +
+            "</i>",
           parse_mode: "html",
         },
         { sendAsMessage: true }
@@ -31,26 +42,43 @@ module.exports = {
   },
   movieRequestHandler: async function (agent) {
     return await movieController
-      .getMovie(agent.parameters)
+      .getMovie(agent.context.get("movie_request-followup").parameters)
       .then(async (res) => {
-        console.log(
-          "#####################################################################################à"
-        );
+        //var results = [];
+        //var len = 1;
+        //var defaultLifespan = 10;
+        // var start =
+        //   defaultLifespan -
+        //   agent.context.get("movie_request-followup").lifespan;
 
-        var results = [];
-        var len = res.data.results.length > 5 ? 5 : res.data.results.length;
-        console.log(agent.parameters);
-        if (typeof agent.parameters.director === "string") {
-          for (let i = 0; i < len; i++) {
-            results.push(res.data.results[i]);
+        // if (
+        //   agent.context.get("movie_request-followup").lifespan ===
+        //   defaultLifespan
+        // ) {
+        //   len = res.data.results.length > 5 ? 5 : res.data.results.length;
+        // } else {
+        //   len = start + len;
+        // }
+        console.log("PARAMETERS:");
+        console.log(agent.context.get("movie_request-followup").parameters);
+        // console.log("ENDING INDEX:");
+        // console.log(len);
+
+        if (res.data.results.length !== 0) {
+          let random = Math.floor(Math.random() * res.data.results.length);
+          var film = res.data.results[random];
+          if (
+            typeof agent.context.get("movie_request-followup").parameters
+              .director !== "string"
+          ) {
+            film = await movieController.checkDirectors(
+              res,
+              agent.context.get("movie_request-followup").parameters.director
+                .name
+            );
           }
-        } else {
-          results = await movieController.checkDirectors(res, agent);
-        }
-        console.log(res.data.results);
-
-        if (results.length !== 0) {
-          let film = results[0];
+          console.log(res.data.results);
+          console.log(random);
           let releaseDate = new Date(Date.parse(film.release_date));
           const card = new Card({
             title: "📽️ " + film.title,
@@ -61,13 +89,19 @@ module.exports = {
               releaseDate.getFullYear() +
               " \n📔 " +
               film.overview,
-            imageUrl: "https://image.tmdb.org/t/p/w400" + film.poster_path,
+            imageUrl: "https://image.tmdb.org/t/p/w200" + film.poster_path,
             platform: "TELEGRAM",
           });
-          // agent.add(card);
-          for (let i = 0; i < results.length; i++) {
-            agent.add(results[i].title);
-          }
+          agent.add(card);
+          // for (let i = 0; i < results.length; i++) {
+          //   // const anotherImage = new Image({
+          //   //   imageUrl:
+          //   //     "https://image.tmdb.org/t/p/w100" + results[i].poster_path,
+          //   //   platform: "TELEGRAM",
+          //   // });
+          //   // agent.add(anotherImage);
+          //   agent.add(results[i].title);
+          // }
         } else {
           // bisognerebbe far partire qualche fallback (con frasi a caso)
           agent.add(
@@ -85,19 +119,21 @@ module.exports = {
       });
   },
 
-  movieRequestRepeatNo: function (agent) {
+  movieRequestRepeatNo: async function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
       agent.add("fuori contesto repeat no!");
     }
-    console.log(agent.context.get("movie_request-followup").parameters);
-    agent.add("movie request non soddisfa l'utente! Altri film!!!!");
+    agent.context.get("movie_request-followup");
+    // console.log(agent.context.get("movie_request-followup"));
+    // agent.add("movie request non soddisfa l'utente! Altri film!!!!");
   },
   movieRequestYes: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
       agent.add("fuori contesto yes");
     }
-    console.log(agent.context.get("movie_request-followup").parameters);
-    agent.add("movie request soddisfa l'utente!");
+    console.log(agent.request_.body.queryResult.fulfillmentText);
+    agent.add(agent.request_.body.queryResult.fulfillmentText);
+    agent.context.delete("movie_request-followup");
   },
   movieRequestCustom: function (agent) {
     if (agent.context.get("movie_request-followup") === null) {
@@ -105,6 +141,19 @@ module.exports = {
     }
     console.log(agent.context.get("movie_request-followup").parameters);
     agent.add("l'utente vuole altri filtri!");
+  },
+
+  helpHandler: function (agent) {
+    agent.add(
+      new Payload(
+        agent.TELEGRAM,
+        {
+          text: "<i>Help intent activated!</i>\nFor example: <i>HELP HELP</i>",
+          parse_mode: "html",
+        },
+        { sendAsMessage: true }
+      )
+    );
   },
   // movieRandomHandler: function (agent) {
   //   return movieController.getRandomMovie().then((res) => {

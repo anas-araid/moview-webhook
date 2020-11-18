@@ -18,9 +18,10 @@ intentMap.set("Default Welcome Intent", handlers.welcomeHandler);
 intentMap.set("Default Fallback Intent", handlers.fallbackHandler);
 intentMap.set("start", handlers.startHandler);
 intentMap.set("movie_request", handlers.movieRequestHandler);
-intentMap.set("movie_request - repeat_no", handlers.movieRequestRepeatNo);
+intentMap.set("movie_request - repeat_no", handlers.movieRequestHandler);
 intentMap.set("movie_request - custom", handlers.movieRequestCustom);
 intentMap.set("movie_request - yes", handlers.movieRequestYes);
+intentMap.set("help", handlers.helpHandler);
 //intentMap.set("movie_random", handlers.movieRandomHandler);
 
 function Webhook(req, res) {

@@ -160,40 +160,47 @@ module.exports = {
         TMDB_KEY
     );
   },
-  checkDirectors: async function (res, agent) {
-    var results = [];
-    var len = res.data.results.length > 5 ? 5 : res.data.results.length;
-    let counter = 0;
-    var countDir = 0;
-    while (results.length != len) {
-      if (countDir == len || counter == res.data.results.length - 1) {
-        break;
-      } else {
-        await this.getMovieCredits(res.data.results[counter].id)
-          .then((response) => {
-            console.log(response.data.id);
-            for (let i = 0; i < response.data.crew.length; i++) {
-              if (
-                response.data.crew[i].job == "Director" &&
-                response.data.crew[i].name
-                  .toLowerCase()
-                  .includes(agent.parameters.director.name)
-              ) {
-                console.log(response.data.crew[i].name + " is the director!!!");
-                results.push(res.data.results[counter]);
-                countDir++;
-                break;
-              }
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+  checkDirectors: async function (res, dir) {
+    var result;
+    //var len = 1;
+    //let counter = 0;
+    //var countDir = 0;
+    var isCorrect = false;
+    while (!isCorrect) {
+      let random = Math.floor(Math.random() * res.data.results.length);
+      let isDirector = false;
+
+      await this.getMovieCredits(res.data.results[random].id)
+        .then((response) => {
+          console.log(response.data.id);
+          for (let i = 0; i < response.data.crew.length; i++) {
+            if (
+              response.data.crew[i].job == "Director" &&
+              response.data.crew[i].name.toLowerCase().includes(dir)
+            ) {
+              console.log(response.data.crew[i].name + " is the director!!!");
+              isDirector = true;
+              result = res.data.results[random];
+              //countDir++;
+              isCorrect = true;
+              break;
+            } //else {
+            //res.data.results.splice(random - 1, 1);
+            //}
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      if (!isDirector) {
+        res.data.results.splice(random, 1);
       }
-      counter++;
+      //random = Math.floor(Math.random() * res.data.results.length);
+      console.log(res.data.results.length);
     }
+
     //console.log(results);
-    return results;
+    return result;
   },
   // getMovieByYear: function (year) {
   //   let query =
