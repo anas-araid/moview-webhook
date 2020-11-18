@@ -1,12 +1,6 @@
 "use strict";
 const movieController = require("../api/movieControllers.js");
-const {
-  WebhookClient,
-  Payload,
-  Card,
-  Image,
-} = require("dialogflow-fulfillment");
-//const { ContextValues } = require("actions-on-google/dist/service/dialogflow");
+const { WebhookClient, Payload, Card, Image } = require("dialogflow-fulfillment");
 
 module.exports = {
   welcomeHandler: function (agent) {
@@ -25,12 +19,10 @@ module.exports = {
         agent.TELEGRAM,
         {
           text:
-            "<i>" +
-            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
-              .greeting +
-            "</i>\nDo you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>" +
-            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
-              .example +
+            "🤖 <i>" +
+              JSON.parse(agent.request_.body.queryResult.fulfillmentText).greeting +
+            "</i>\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
+              JSON.parse(agent.request_.body.queryResult.fulfillmentText).example +
             "</i>",
           parse_mode: "html",
         },
