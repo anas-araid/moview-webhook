@@ -56,7 +56,7 @@ module.exports = {
     return axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=" +
         TMDB_KEY +
-        "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1" +
+        "&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=1" +
         query
     );
   },
@@ -140,7 +140,15 @@ module.exports = {
     }
     var decade = decadeFrom + decadeTo;
 
-    var query = actors + keywords + director + genres + year + decade;
+    var runtime = "&with_runtime.lte=";
+    if (typeof params.duration === "object") {
+      runtime +=
+        params.duration.unit === "h"
+          ? params.duration.amount * 60
+          : params.duration.amount;
+    }
+
+    var query = actors + keywords + director + genres + year + decade + runtime;
     console.log(query);
     return query;
   },
@@ -156,8 +164,9 @@ module.exports = {
     var results = [];
     var len = res.data.results.length > 5 ? 5 : res.data.results.length;
     let counter = 0;
+    var countDir = 0;
     while (results.length != len) {
-      if (counter == len) {
+      if (countDir == len || counter == res.data.results.length - 1) {
         break;
       } else {
         await this.getMovieCredits(res.data.results[counter].id)
@@ -172,6 +181,7 @@ module.exports = {
               ) {
                 console.log(response.data.crew[i].name + " is the director!!!");
                 results.push(res.data.results[counter]);
+                countDir++;
                 break;
               }
             }

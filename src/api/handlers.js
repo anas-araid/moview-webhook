@@ -47,7 +47,7 @@ module.exports = {
         } else {
           results = await movieController.checkDirectors(res, agent);
         }
-        console.log(results);
+        console.log(res.data.results);
 
         if (results.length !== 0) {
           let film = results[0];
@@ -64,10 +64,10 @@ module.exports = {
             imageUrl: "https://image.tmdb.org/t/p/w400" + film.poster_path,
             platform: "TELEGRAM",
           });
-          agent.add(card);
-          // for (let i = 0; i < results.length; i++) {
-          //   agent.add(results[i].title);
-          // }
+          // agent.add(card);
+          for (let i = 0; i < results.length; i++) {
+            agent.add(results[i].title);
+          }
         } else {
           // bisognerebbe far partire qualche fallback (con frasi a caso)
           agent.add(
