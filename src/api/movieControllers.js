@@ -7,10 +7,10 @@ var fs = require('fs');
 
 const TMDB_KEY = process.env.TMDB_KEY;
 // contiene tutti i generi da tmdb
-const GENRES = JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8'));
+//const GENRES = JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8'));
 
 module.exports = {
-  GENRES: GENRES,
+  GENRES: JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8')),
   // restituisce un film casuale
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente
@@ -114,25 +114,35 @@ module.exports = {
       keywords = keywords.slice(0, -1);
     }
     var genres = "&with_genres=";
-    await this.getGenres()
-      .then((res) => {
-        for (let i = 0; i < params.genre.length; i++) {
-          var genreName =
-            params.genre[i].charAt(0).toUpperCase() +
-            params.genre[i].substring(1);
-          for (let x = 0; x < res.data.genres.length; x++) {
-            if (genreName === res.data.genres[x].name) {
-              genres += res.data.genres[x].id + ",";
-            }
-          }
-        }
-        if (genres.charAt(genres.length - 1) !== "=") {
-          genres = genres.slice(0, -1);
+    params.genre.forEach(paramGenre => {
+      this.GENRES.forEach(genre => {
+        if (paramGenre.toLowerCase() === genre.name.toLowerCase()){
+          genres += genre.id + ","
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+    });
+    if (genres.charAt(genres.length - 1) !== "=") {
+      genres = genres.slice(0, -1);
+    }
+    // await this.getGenres()
+    //   .then((res) => {
+    //     for (let i = 0; i < params.genre.length; i++) {
+    //       var genreName =
+    //         params.genre[i].charAt(0).toUpperCase() +
+    //         params.genre[i].substring(1);
+    //       for (let x = 0; x < res.data.genres.length; x++) {
+    //         if (genreName === res.data.genres[x].name) {
+    //           genres += res.data.genres[x].id + ",";
+    //         }
+    //       }
+    //     }
+    //     if (genres.charAt(genres.length - 1) !== "=") {
+    //       genres = genres.slice(0, -1);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
     var year = "&primary_release_year=" + params.year;
     var decadeFrom = "&primary_release_date.gte=";
     var decadeTo = "&primary_release_date.lte=";
