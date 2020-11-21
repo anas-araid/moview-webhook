@@ -1,6 +1,11 @@
 "use strict";
 const movieController = require("../api/movieControllers.js");
-const { WebhookClient, Payload, Card, Image } = require("dialogflow-fulfillment");
+const {
+  WebhookClient,
+  Payload,
+  Card,
+  Image,
+} = require("dialogflow-fulfillment");
 
 module.exports = {
   welcomeHandler: function (agent) {
@@ -21,9 +26,11 @@ module.exports = {
         {
           text:
             "🤖 <i>" +
-              JSON.parse(agent.request_.body.queryResult.fulfillmentText).greeting +
+            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
+              .greeting +
             "</i>\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
-              JSON.parse(agent.request_.body.queryResult.fulfillmentText).example +
+            JSON.parse(agent.request_.body.queryResult.fulfillmentText)
+              .example +
             "</i>",
           parse_mode: "html",
         },
@@ -34,7 +41,7 @@ module.exports = {
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: async function (agent) {
-    console.log(movieController.GENRES)
+    console.log(movieController.GENRES);
     return await movieController
       .getMovie(agent.context.get("movie_request-followup").parameters)
       .then(async (res) => {
@@ -73,13 +80,13 @@ module.exports = {
           }
           console.log(film);
           // cardGenres contiene i generi del film selezionato
-          let cardGenres = '';
-          for (let j=0; j < film.genre_ids.length; j++){
-            movieController.GENRES.forEach( (genre) => {
-              if (genre.id === film.genre_ids[j]){
-                cardGenres += genre.name + "|"
+          let cardGenres = "";
+          for (let j = 0; j < film.genre_ids.length; j++) {
+            movieController.GENRES.forEach((genre) => {
+              if (genre.id === film.genre_ids[j]) {
+                cardGenres += genre.name + "|";
               }
-           })
+            });
           }
           // rimuovo l'ultimo |
           cardGenres = cardGenres.slice(0, -1);
@@ -87,15 +94,21 @@ module.exports = {
           const card = new Card({
             title: "📽️ " + film.title,
             text:
-              "\n📆 " + releaseDate.getFullYear() +
-              "\n🎬 " + cardGenres + 
-              "\n🌟 " + film.vote_average + "/10 "+
+              "\n📆 " +
+              releaseDate.getFullYear() +
+              "\n🎬 " +
+              cardGenres +
+              "\n🌟 " +
+              film.vote_average +
+              "/10 " +
               "\n📔 " +
               film.overview,
             imageUrl: "https://image.tmdb.org/t/p/w200" + film.poster_path,
             platform: "TELEGRAM",
           });
           agent.add(card);
+          agent.add(agent.request_.body.queryResult.fulfillmentText);
+
           // for (let i = 0; i < results.length; i++) {
           //   // const anotherImage = new Image({
           //   //   imageUrl:
@@ -151,7 +164,10 @@ module.exports = {
       new Payload(
         agent.TELEGRAM,
         {
-          text: "<i>Help intent activated!</i>\nFor example: <i>HELP HELP</i>",
+          text:
+            "❓ With this bot you can receive a suggestion for a movie based on:\n - actors\n - directors\n - genre\n - decade\n - release year\n - runtime\n - keywords\nFor example: <i>" +
+            agent.request_.body.queryResult.fulfillmentText +
+            "</i>",
           parse_mode: "html",
         },
         { sendAsMessage: true }

@@ -3,14 +3,14 @@
 require("dotenv").config();
 const axios = require("axios");
 const { query } = require("express");
-var fs = require('fs');
+var fs = require("fs");
 
 const TMDB_KEY = process.env.TMDB_KEY;
 // contiene tutti i generi da tmdb
 //const GENRES = JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8'));
 
 module.exports = {
-  GENRES: JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8')),
+  GENRES: JSON.parse(fs.readFileSync("./src/api/data/genres.json", "utf8")),
   // restituisce un film casuale
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente
@@ -96,11 +96,11 @@ module.exports = {
     }
 
     var keywords = "&with_keywords=";
-    for (let i = 0; i < params.keywords_1.length; i++) {
-      await this.getKeyword(params.keywords_1[i])
+    for (let i = 0; i < params["keywords_1.original"].length; i++) {
+      await this.getKeyword(params["keywords_1.original"][i])
         .then((res) => {
           let kw = res.data.results.filter(function (value) {
-            return value.name == params.keywords_1[i];
+            return value.name == params["keywords_1.original"][i];
           });
           if (kw.length !== 0) {
             keywords += kw[0].id + ",";
@@ -114,12 +114,12 @@ module.exports = {
       keywords = keywords.slice(0, -1);
     }
     var genres = "&with_genres=";
-    params.genre.forEach(paramGenre => {
-      this.GENRES.forEach(genre => {
-        if (paramGenre.toLowerCase() === genre.name.toLowerCase()){
-          genres += genre.id + ","
+    params.genre.forEach((paramGenre) => {
+      this.GENRES.forEach((genre) => {
+        if (paramGenre.toLowerCase() === genre.name.toLowerCase()) {
+          genres += genre.id + ",";
         }
-      })
+      });
     });
     if (genres.charAt(genres.length - 1) !== "=") {
       genres = genres.slice(0, -1);
