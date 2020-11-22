@@ -64,6 +64,9 @@ module.exports = {
         query
     );
   },
+  getCountry: async function (params) {
+    return axios.get("https://restcountries.eu/rest/v2/name/" + params);
+  },
   // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
     console.log(params);
@@ -114,35 +117,35 @@ module.exports = {
       keywords = keywords.slice(0, -1);
     }
     var genres = "&with_genres=";
-    params.genre.forEach((paramGenre) => {
-      this.GENRES.forEach((genre) => {
-        if (paramGenre.toLowerCase() === genre.name.toLowerCase()) {
-          genres += genre.id + ",";
-        }
-      });
-    });
-    if (genres.charAt(genres.length - 1) !== "=") {
-      genres = genres.slice(0, -1);
-    }
-    // await this.getGenres()
-    //   .then((res) => {
-    //     for (let i = 0; i < params.genre.length; i++) {
-    //       var genreName =
-    //         params.genre[i].charAt(0).toUpperCase() +
-    //         params.genre[i].substring(1);
-    //       for (let x = 0; x < res.data.genres.length; x++) {
-    //         if (genreName === res.data.genres[x].name) {
-    //           genres += res.data.genres[x].id + ",";
-    //         }
-    //       }
+    // params.genre.forEach((paramGenre) => {
+    //   this.GENRES.forEach((genre) => {
+    //     if (paramGenre.toLowerCase() === genre.name.toLowerCase()) {
+    //       genres += genre.id + ",";
     //     }
-    //     if (genres.charAt(genres.length - 1) !== "=") {
-    //       genres = genres.slice(0, -1);
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
     //   });
+    // });
+    await this.getGenres()
+      .then((res) => {
+        for (let i = 0; i < params.genre.length; i++) {
+          var genreName =
+            params.genre[i].charAt(0).toUpperCase() +
+            params.genre[i].substring(1);
+          for (let x = 0; x < res.data.genres.length; x++) {
+            if (genreName === res.data.genres[x].name) {
+              genres += res.data.genres[x].id + ",";
+            }
+          }
+        }
+        if (genres.charAt(genres.length - 1) !== "=") {
+          genres = genres.slice(0, -1);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    // if (genres.charAt(genres.length - 1) !== "=") {
+    //   genres = genres.slice(0, -1);
+    // }
     var year = "&primary_release_year=" + params.year;
     var decadeFrom = "&primary_release_date.gte=";
     var decadeTo = "&primary_release_date.lte=";
@@ -162,7 +165,25 @@ module.exports = {
           : params.duration.amount;
     }
 
-    var query = actors + keywords + director + genres + year + decade + runtime;
+    var language = "&with_original_language=";
+    if (params.country !== "") {
+      await this.getCountry(params.country)
+        .then((res) => {
+          console.log(res.data[0].languages[0].iso639_1);
+          language += res.data[0].languages[0].iso639_1;
+        })
+        .catch((err) => console.error(err));
+    }
+
+    var query =
+      actors +
+      keywords +
+      director +
+      genres +
+      year +
+      decade +
+      runtime +
+      language;
     console.log(query);
     return query;
   },

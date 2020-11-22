@@ -28,7 +28,7 @@ module.exports = {
             "🤖 <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .greeting +
-            "</i>\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
+            "</i>\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, decade, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .example +
             "</i>",
@@ -45,6 +45,8 @@ module.exports = {
     return await movieController
       .getMovie(agent.context.get("movie_request-followup").parameters)
       .then(async (res) => {
+        console.log(res.data.total_pages);
+
         //var results = [];
         //var len = 1;
         //var defaultLifespan = 10;
@@ -80,16 +82,33 @@ module.exports = {
           }
           console.log(film);
           // cardGenres contiene i generi del film selezionato
-          let cardGenres = "";
-          for (let j = 0; j < film.genre_ids.length; j++) {
-            movieController.GENRES.forEach((genre) => {
-              if (genre.id === film.genre_ids[j]) {
-                cardGenres += genre.name + "|";
-              }
-            });
-          }
+          // let cardGenres = "";
+          // for (let j = 0; j < film.genre_ids.length; j++) {
+          //   movieController.GENRES.forEach((genre) => {
+          //     if (genre.id === film.genre_ids[j]) {
+          //       cardGenres += genre.name + "|";
+          //     }
+          //   });
+          // }
           // rimuovo l'ultimo |
-          cardGenres = cardGenres.slice(0, -1);
+          var cardGenres = "";
+          await movieController
+            .getGenres()
+            .then((response) => {
+              for (let x = 0; x < film.genre_ids.length; x++) {
+                for (let i = 0; i < response.data.genres.length; i++) {
+                  if (film.genre_ids[x] === response.data.genres[i].id) {
+                    var bar = x == film.genre_ids.length - 1 ? "" : "|";
+                    cardGenres += response.data.genres[i].name + bar;
+                    break;
+                  }
+                }
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+          //cardGenres = cardGenres.slice(0, -1);
           let releaseDate = new Date(Date.parse(film.release_date));
           const card = new Card({
             title: "📽️ " + film.title,
@@ -136,27 +155,18 @@ module.exports = {
   },
 
   movieRequestRepeatNo: async function (agent) {
-    if (agent.context.get("movie_request-followup") === null) {
-      agent.add("fuori contesto repeat no!");
-    }
     agent.context.get("movie_request-followup");
     // console.log(agent.context.get("movie_request-followup"));
     // agent.add("movie request non soddisfa l'utente! Altri film!!!!");
   },
   movieRequestYes: function (agent) {
-    if (agent.context.get("movie_request-followup") === null) {
-      agent.add("fuori contesto yes");
-    }
     console.log(agent.request_.body.queryResult.fulfillmentText);
     agent.add(agent.request_.body.queryResult.fulfillmentText);
     agent.context.delete("movie_request-followup");
   },
   movieRequestCustom: function (agent) {
-    if (agent.context.get("movie_request-followup") === null) {
-      agent.add("fuori contesto custom!");
-    }
     console.log(agent.context.get("movie_request-followup").parameters);
-    agent.add("l'utente vuole altri filtri!");
+    agent.add(agent.request_.body.queryResult.fulfillmentText);
   },
 
   helpHandler: function (agent) {
@@ -165,7 +175,7 @@ module.exports = {
         agent.TELEGRAM,
         {
           text:
-            "❓ With this bot you can receive a suggestion for a movie based on:\n - actors\n - directors\n - genre\n - decade\n - release year\n - runtime\n - keywords\nFor example: <i>" +
+            "💬 With this bot you can receive a suggestion for a movie based on:\n\n 🎭 actors\n 🎥 directors\n 📼 genre\n 📅 decade\n 🗓️ release year\n ⌚ runtime\n 🌐 language\n 🏷️ keywords\n\nFor example: <i>" +
             agent.request_.body.queryResult.fulfillmentText +
             "</i>",
           parse_mode: "html",
