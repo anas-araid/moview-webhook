@@ -28,7 +28,7 @@ module.exports = {
             "🤖 <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .greeting +
-            "</i>\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, decade, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
+            "</i> (" + JSON.parse(agent.request_.body.queryResult.fulfillmentText).movie + ")\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, decade, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .example +
             "</i>",
@@ -41,12 +41,30 @@ module.exports = {
     //agent.add(new Payload(agent.TELEGRAM, {"text": "Do you want a movie suggestion from specific actors, directors, genres, year, language? You can also provide keywords to further narrow down the research. \nFor example: <i>give me an action movie from the 80s with Stallone</i>", "parse_mode": "html"}, {sendAsMessage: true}));
   },
   movieRequestHandler: async function (agent) {
-    console.log(movieController.GENRES);
     return await movieController
-      .getMovie(agent.context.get("movie_request-followup").parameters)
+      .getMovie(agent.context.get("movie_request-followup").parameters, 1)
       .then(async (res) => {
-        console.log(res.data.total_pages);
-
+        var results = res.data.results
+        if (res.data.total_pages > 1) {
+          if (res.data.total_pages >= 3) {
+            for (let n = 2; n < 4; n++) {
+              await movieController
+                .getMovie(agent.context.get("movie_request-followup").parameters, n)
+                .then(async (res2) => {
+                  Array.prototype.push.apply(results, res2.data.results)
+                })
+                .catch(err => { console.error(err) });
+            }
+          }
+          else {
+            await movieController
+              .getMovie(agent.context.get("movie_request-followup").parameters, 2)
+              .then(async (res2) => {
+                Array.prototype.push.apply(results, res2.data.results)
+              })
+              .catch(err => { console.error(err) });
+          }
+        }
         //var results = [];
         //var len = 1;
         //var defaultLifespan = 10;
@@ -62,14 +80,14 @@ module.exports = {
         // } else {
         //   len = start + len;
         // }
-        console.log("PARAMETERS:");
-        console.log(agent.context.get("movie_request-followup").parameters);
+        // console.log("PARAMETERS:");
+        // console.log(agent.context.get("movie_request-followup").parameters);
         // console.log("ENDING INDEX:");
         // console.log(len);
 
-        if (res.data.results.length !== 0) {
-          let random = Math.floor(Math.random() * res.data.results.length);
-          var film = res.data.results[random];
+        if (results.length !== 0) {
+          let random = Math.floor(Math.random() * results.length);
+          var film = results[random];
           if (
             typeof agent.context.get("movie_request-followup").parameters
               .director !== "string"
@@ -80,7 +98,7 @@ module.exports = {
                 .name
             );
           }
-          console.log(film);
+          // console.log(film);
           // cardGenres contiene i generi del film selezionato
           // let cardGenres = "";
           // for (let j = 0; j < film.genre_ids.length; j++) {
@@ -95,11 +113,12 @@ module.exports = {
           await movieController
             .getGenres()
             .then((response) => {
+              //var bar = ""
               for (let x = 0; x < film.genre_ids.length; x++) {
                 for (let i = 0; i < response.data.genres.length; i++) {
                   if (film.genre_ids[x] === response.data.genres[i].id) {
-                    var bar = x == film.genre_ids.length - 1 ? "" : "|";
-                    cardGenres += response.data.genres[i].name + bar;
+                    //bar = x == film.genre_ids.length - 1 ? "" : "|";
+                    cardGenres += "#" + response.data.genres[i].name.split('').filter(e => e.trim().length).join('') + " ";
                     break;
                   }
                 }
@@ -110,21 +129,19 @@ module.exports = {
             });
           //cardGenres = cardGenres.slice(0, -1);
           let releaseDate = new Date(Date.parse(film.release_date));
+          console.log(film.overview)
           const card = new Card({
             title: "📽️ " + film.title,
             text:
-              "\n📆 " +
-              releaseDate.getFullYear() +
-              "\n🎬 " +
-              cardGenres +
-              "\n🌟 " +
-              film.vote_average +
-              "/10 " +
-              "\n📔 " +
-              film.overview,
-            imageUrl: "https://image.tmdb.org/t/p/w200" + film.poster_path,
+              (isNaN(releaseDate.getFullYear()) ? '' : ("\n📆 " + releaseDate.getFullYear())) +
+              (cardGenres == "" ? '' : ("\n🎬 " + cardGenres)) +
+              (isNaN(film.vote_average) ? '' : ("\n🌟 " + film.vote_average + "/10 ")) +
+              (film.overview == "" ? '' : ("\n📔 " + film.overview)),
             platform: "TELEGRAM",
           });
+          if (film.poster_path != null) {
+            card.setImage("https://image.tmdb.org/t/p/w200" + film.poster_path)
+          }
           agent.add(card);
           agent.add(agent.request_.body.queryResult.fulfillmentText);
 
@@ -160,8 +177,18 @@ module.exports = {
     // agent.add("movie request non soddisfa l'utente! Altri film!!!!");
   },
   movieRequestYes: function (agent) {
-    console.log(agent.request_.body.queryResult.fulfillmentText);
-    agent.add(agent.request_.body.queryResult.fulfillmentText);
+    //console.log(agent.request_.body.queryResult.fulfillmentText);
+    agent.add(
+      new Payload(
+        agent.TELEGRAM,
+        {
+          text: "<i>" + JSON.parse(agent.request_.body.queryResult.fulfillmentText).msg + "</i> (" + JSON.parse(agent.request_.body.queryResult.fulfillmentText).movie + ")",
+          parse_mode: "html",
+        },
+        { sendAsMessage: true }
+      )
+    );
+    //agent.add(agent.request_.body.queryResult.fulfillmentText);
     agent.context.delete("movie_request-followup");
   },
   movieRequestCustom: function (agent) {

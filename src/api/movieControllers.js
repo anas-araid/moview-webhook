@@ -10,7 +10,7 @@ const TMDB_KEY = process.env.TMDB_KEY;
 //const GENRES = JSON.parse(fs.readFileSync('./src/api/data/genres.json', 'utf8'));
 
 module.exports = {
-  GENRES: JSON.parse(fs.readFileSync("./src/api/data/genres.json", "utf8")),
+  LANGS: JSON.parse(fs.readFileSync('./src/api/data/langs.json', 'utf8')),
   // restituisce un film casuale
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente
@@ -34,38 +34,44 @@ module.exports = {
   getPerson: function (params) {
     return axios.get(
       "https://api.themoviedb.org/3/search/person?api_key=" +
-        TMDB_KEY +
-        "&language=en-US&page=1&include_adult=false&query=" +
-        params
+      TMDB_KEY +
+      "&language=en-US&page=1&include_adult=false&query=" +
+      params
     );
   },
   // restituisce le keyword in base al parametro passato
   getKeyword: function (params) {
     return axios.get(
       "https://api.themoviedb.org/3/search/keyword?api_key=" +
-        TMDB_KEY +
-        "&language=en-US&page=1&include_adult=false&query=" +
-        params
+      TMDB_KEY +
+      "&language=en-US&page=1&include_adult=false&query=" +
+      params
     );
   },
   getGenres: function () {
     return axios.get(
       "https://api.themoviedb.org/3/genre/movie/list?api_key=" +
-        TMDB_KEY +
-        "&language=en-US"
+      TMDB_KEY +
+      "&language=en-US"
     );
   },
-  getMovie: async function (params) {
+  getMovie: async function (params, page) {
     let query = await this.handleParameters(params);
     return axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=" +
-        TMDB_KEY +
-        "&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=1" +
-        query
+      TMDB_KEY +
+      "&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=" + page + "" +
+      query
     );
   },
-  getCountry: async function (params) {
-    return axios.get("https://restcountries.eu/rest/v2/name/" + params);
+  getLang: function (params) {
+    for (let i = 0; i < this.LANGS.length; i++) {
+      for (let x = 0; x < this.LANGS[i].languages.length; x++) {
+        if (this.LANGS[i].languages[x].name.toLowerCase() == params.toLowerCase()) {
+          return this.LANGS[i].languages[x].iso639_1
+        }
+      }
+    }
   },
   // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
@@ -166,13 +172,8 @@ module.exports = {
     }
 
     var language = "&with_original_language=";
-    if (params.country !== "") {
-      await this.getCountry(params.country)
-        .then((res) => {
-          console.log(res.data[0].languages[0].iso639_1);
-          language += res.data[0].languages[0].iso639_1;
-        })
-        .catch((err) => console.error(err));
+    if (params.language !== "") {
+      language += this.getLang(params.language)
     }
 
     var query =
@@ -190,9 +191,9 @@ module.exports = {
   getMovieCredits: function (id) {
     return axios.get(
       "https://api.themoviedb.org/3/movie/" +
-        id +
-        "/credits?api_key=" +
-        TMDB_KEY
+      id +
+      "/credits?api_key=" +
+      TMDB_KEY
     );
   },
   checkDirectors: async function (res, dir) {
