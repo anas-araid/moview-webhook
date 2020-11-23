@@ -6,6 +6,7 @@ const {
   Card,
   Image,
 } = require("dialogflow-fulfillment");
+require("dotenv").config();
 
 module.exports = {
   errorMsg: function (agent) {
@@ -24,7 +25,39 @@ module.exports = {
   fallbackHandler: function (agent) {
     agent.add(agent.request_.body.queryResult.fulfillmentText);
   },
-  startHandler: function (agent) {
+  startHandler: async function (agent) {
+    const axios = require("axios")
+    await axios({
+      method: "GET",
+      url: "https://json.extendsclass.com/bin/" + process.env.JSON_BIN_NUMBER,
+    }).then(res => {
+      var results = res.data
+      var found = false
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].id == agent.originalRequest.payload.data.from.id) {
+          found = true
+          break;
+        }
+      }
+      if (!found) {
+        var obj = {
+          id: agent.originalRequest.payload.data.from.id,
+          username: agent.originalRequest.payload.data.from.username
+        }
+        results.push(obj)
+        axios({
+          method: "PUT",
+          url: "https://json.extendsclass.com/bin/" + process.env.JSON_BIN_NUMBER,
+          data: results
+        })
+          .catch(err => {
+            console.error(err)
+          })
+      }
+    })
+      .catch(err => {
+        console.error(err)
+      })
     agent.add(
       new Payload(
         agent.TELEGRAM,
@@ -33,7 +66,7 @@ module.exports = {
             "🤖 <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .greeting +
-            "</i> (" + JSON.parse(agent.request_.body.queryResult.fulfillmentText).movie + ")\n\n🎥 Do you want a movie suggestion from specific actors, directors, genres, year, decade, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
+            "</i> (" + JSON.parse(agent.request_.body.queryResult.fulfillmentText).movie + ")\n\n🎥 Do you want a movie suggestion from specific actors, director, genres, year, decade, language? You can also provide keywords to further narrow down the research. \n\n💬 For example: <i>" +
             JSON.parse(agent.request_.body.queryResult.fulfillmentText)
               .example +
             "</i>",
@@ -156,7 +189,7 @@ module.exports = {
         agent.TELEGRAM,
         {
           text:
-            "💬 With this bot you can receive a suggestion for a movie based on:\n\n 🎭 actors\n 🎥 directors\n 📼 genre\n 📅 decade\n 🗓️ release year\n ⌚ runtime\n 🌐 language\n 🏷️ keywords\n\nFor example: <i>" +
+            "💬 With this bot you can receive a suggestion for a movie based on:\n\n 🎭 actors\n 🎥 director\n 📼 genres\n 📅 decade\n 🗓️ release year\n ⌚ runtime\n 🌐 language\n 🏷️ keywords\n\nFor example: <i>" +
             agent.request_.body.queryResult.fulfillmentText +
             "</i>",
           parse_mode: "html",
