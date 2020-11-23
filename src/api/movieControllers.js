@@ -2,7 +2,6 @@
 
 require("dotenv").config();
 const axios = require("axios");
-const { query } = require("express");
 var fs = require("fs");
 
 const TMDB_KEY = process.env.TMDB_KEY;
@@ -57,9 +56,9 @@ module.exports = {
   },
   getMovie: async function (params, page) {
     let query = await this.handleParameters(params);
-    if (query == undefined) {
+    if (query === undefined) {
       return new Promise(function (resolve) {
-        resolve(undefined)
+        resolve(undefined);
       });
     }
     return axios.get(
@@ -70,18 +69,19 @@ module.exports = {
     );
   },
   getLang: function (params) {
+    // this.LANGS è un json con tutte le lingue
     for (let i = 0; i < this.LANGS.length; i++) {
       for (let x = 0; x < this.LANGS[i].languages.length; x++) {
-        if (this.LANGS[i].languages[x].name.toLowerCase() == params.toLowerCase()) {
-          return this.LANGS[i].languages[x].iso639_1
+        if (this.LANGS[i].languages[x].name.toLowerCase() === params.toLowerCase()) {
+          // restituisce l'iso della lingua
+          return this.LANGS[i].languages[x].iso639_1;
         }
       }
     }
   },
   // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
-    console.log(params);
-    if (params.country != "") {
+    if (params.country !== "") {
       return undefined
     }
     var actors = "&with_cast=";
@@ -89,14 +89,16 @@ module.exports = {
     for (let i = 0; i < params.actor.length; i++) {
       await this.getPerson(params.actor[i].name)
         .then((res) => {
-          actors += res.data.results[0].id + ",";
+          if (res.data.results.length > 0 && typeof res.data.results !== 'undefined'){
+            actors += res.data.results[0].id + ",";
+          }
         })
         .catch((err) => {
           console.error(err);
         });
     }
-    if (params.actor.length != 0 && actors == "&with_cast=") {
-      return undefined
+    if (params.actor.length !== 0 && actors === "&with_cast=") {
+      return undefined;
     }
     // se non ci sono attori, rimuove il carattere '=' dalla stringa
     if (actors.charAt(actors.length - 1) !== "=") {
@@ -106,7 +108,7 @@ module.exports = {
     if (params.director !== "") {
       await this.getPerson(params.director.name)
         .then((res) => {
-          if (res.data.results[0].known_for_department == "Directing") {
+          if (res.data.results[0].known_for_department === "Directing") {
             director += res.data.results[0].id;
           }
           else {
@@ -117,8 +119,8 @@ module.exports = {
           console.error(err);
         });
     }
-    if (director == "STOP") {
-      return undefined
+    if (director === "STOP") {
+      return undefined;
     }
     var keywords = "&with_keywords=";
     for (let i = 0; i < params["keywords_1.original"].length; i++) {
@@ -136,7 +138,7 @@ module.exports = {
         });
     }
     if (params["keywords_1.original"].length != 0 && keywords == "&with_keywords=") {
-      return undefined
+      return undefined;
     }
     if (keywords.charAt(keywords.length - 1) !== "=") {
       keywords = keywords.slice(0, -1);
@@ -177,10 +179,7 @@ module.exports = {
 
     var runtime = "&with_runtime.lte=";
     if (typeof params.duration === "object") {
-      runtime +=
-        params.duration.unit === "h"
-          ? params.duration.amount * 60
-          : params.duration.amount;
+      runtime += (params.duration.unit === "h") ? params.duration.amount * 60 : params.duration.amount;
     }
 
     var language = "&with_original_language=";
@@ -188,7 +187,7 @@ module.exports = {
       language += this.getLang(params.language)
     }
     if (params.language != "" && language == "&with_original_language=") {
-      return undefined
+      return undefined;
     }
     var query =
       actors +
@@ -199,7 +198,6 @@ module.exports = {
       decade +
       runtime +
       language;
-    console.log(query);
     return query;
   },
   getMovieCredits: function (id) {
@@ -221,7 +219,6 @@ module.exports = {
       }
       await this.getMovieCredits(res[random].id)
         .then((response) => {
-          console.log(response.data.id);
           for (let i = 0; i < response.data.crew.length; i++) {
             if (
               response.data.crew[i].job == "Director" &&
@@ -242,16 +239,5 @@ module.exports = {
       }
     }
     return result;
-  },
-  // getMovieByYear: function (year) {
-  //   let query =
-  //     "https://api.themoviedb.org/3/discover/movie?api_key=" +
-  //     TMDB_KEY +
-  //     "&year=" +
-  //     year;
-  //   return axios.get(query);
-  // },
-  // getMovieByKeyword: function (keyword) {},
-  // getMovieByDuration: function (duration) {},
-  // ECC.
+  }
 };

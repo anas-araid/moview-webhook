@@ -1,11 +1,6 @@
 "use strict";
 const movieController = require("../api/movieControllers.js");
-const {
-  WebhookClient,
-  Payload,
-  Card,
-  Image,
-} = require("dialogflow-fulfillment");
+const { Payload, Card } = require("dialogflow-fulfillment");
 require("dotenv").config();
 
 module.exports = {
@@ -26,6 +21,7 @@ module.exports = {
     agent.add(agent.request_.body.queryResult.fulfillmentText);
   },
   startHandler: async function (agent) {
+    // quando un utente avvia per la prima volta il bot, il servizio salva id e username per migliorare l'esperienza utente (forse)
     const axios = require("axios")
     await axios({
       method: "GET",
@@ -80,7 +76,7 @@ module.exports = {
     return await movieController
       .getMovie(agent.context.get("movie_request-followup").parameters, 1)
       .then(async (res) => {
-        if (res == undefined) {
+        if (res === undefined) {
           module.exports.errorMsg(agent)
         }
         else {
@@ -105,8 +101,10 @@ module.exports = {
                 .catch(err => { console.error(err) });
             }
           }
+          // results è un array con tutti i film trovati
           if (results.length !== 0) {
             let random = Math.floor(Math.random() * results.length);
+            // estrae un film a caso
             var film = results[random];
             if (
               typeof agent.context.get("movie_request-followup").parameters
@@ -127,6 +125,7 @@ module.exports = {
                   for (let x = 0; x < film.genre_ids.length; x++) {
                     for (let i = 0; i < response.data.genres.length; i++) {
                       if (film.genre_ids[x] === response.data.genres[i].id) {
+                        // rimuove lo spazio ed aggiunge # al genere
                         cardGenres += "#" + response.data.genres[i].name.split('').filter(e => e.trim().length).join('') + " ";
                         break;
                       }
@@ -137,7 +136,6 @@ module.exports = {
                   console.error(err);
                 });
               let releaseDate = new Date(Date.parse(film.release_date));
-              console.log(film.overview)
               const card = new Card({
                 title: "📽️ " + film.title,
                 text:
@@ -179,7 +177,6 @@ module.exports = {
     agent.context.delete("movie_request-followup");
   },
   movieRequestCustom: function (agent) {
-    console.log(agent.context.get("movie_request-followup").parameters);
     agent.add(agent.request_.body.queryResult.fulfillmentText);
   },
 
