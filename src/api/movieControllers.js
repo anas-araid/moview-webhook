@@ -57,6 +57,11 @@ module.exports = {
   },
   getMovie: async function (params, page) {
     let query = await this.handleParameters(params);
+    if (query == undefined) {
+      return new Promise(function (resolve) {
+        resolve(undefined)
+      });
+    }
     return axios.get(
       "https://api.themoviedb.org/3/discover/movie?api_key=" +
       TMDB_KEY +
@@ -76,6 +81,9 @@ module.exports = {
   // restituisce una parte della query finale (attori, regista e keywords)
   handleParameters: async function (params) {
     console.log(params);
+    if (params.country != "") {
+      return undefined
+    }
     var actors = "&with_cast=";
     // per ogni attore richiede il suo l'id dall'api (serve poi per costruire la query)
     for (let i = 0; i < params.actor.length; i++) {
@@ -86,6 +94,9 @@ module.exports = {
         .catch((err) => {
           console.error(err);
         });
+    }
+    if (params.actor.length != 0 && actors == "&with_cast=") {
+      return undefined
     }
     // se non ci sono attori, rimuove il carattere '=' dalla stringa
     if (actors.charAt(actors.length - 1) !== "=") {
@@ -98,12 +109,17 @@ module.exports = {
           if (res.data.results[0].known_for_department == "Directing") {
             director += res.data.results[0].id;
           }
+          else {
+            director = "STOP";
+          }
         })
         .catch((err) => {
           console.error(err);
         });
     }
-
+    if (director == "STOP") {
+      return undefined
+    }
     var keywords = "&with_keywords=";
     for (let i = 0; i < params["keywords_1.original"].length; i++) {
       await this.getKeyword(params["keywords_1.original"][i])
@@ -119,17 +135,13 @@ module.exports = {
           console.error(err);
         });
     }
+    if (params["keywords_1.original"].length != 0 && keywords == "&with_keywords=") {
+      return undefined
+    }
     if (keywords.charAt(keywords.length - 1) !== "=") {
       keywords = keywords.slice(0, -1);
     }
     var genres = "&with_genres=";
-    // params.genre.forEach((paramGenre) => {
-    //   this.GENRES.forEach((genre) => {
-    //     if (paramGenre.toLowerCase() === genre.name.toLowerCase()) {
-    //       genres += genre.id + ",";
-    //     }
-    //   });
-    // });
     await this.getGenres()
       .then((res) => {
         for (let i = 0; i < params.genre.length; i++) {
@@ -149,9 +161,9 @@ module.exports = {
       .catch((err) => {
         console.error(err);
       });
-    // if (genres.charAt(genres.length - 1) !== "=") {
-    //   genres = genres.slice(0, -1);
-    // }
+    if (params.genre.length != 0 && genres == "&with_genres=") {
+      return undefined
+    }
     var year = "&primary_release_year=" + params.year;
     var decadeFrom = "&primary_release_date.gte=";
     var decadeTo = "&primary_release_date.lte=";
@@ -175,7 +187,9 @@ module.exports = {
     if (params.language !== "") {
       language += this.getLang(params.language)
     }
-
+    if (params.language != "" && language == "&with_original_language=") {
+      return undefined
+    }
     var query =
       actors +
       keywords +
@@ -198,15 +212,14 @@ module.exports = {
   },
   checkDirectors: async function (res, dir) {
     var result;
-    //var len = 1;
-    //let counter = 0;
-    //var countDir = 0;
     var isCorrect = false;
     while (!isCorrect) {
-      let random = Math.floor(Math.random() * res.data.results.length);
+      let random = Math.floor(Math.random() * res.length);
       let isDirector = false;
-
-      await this.getMovieCredits(res.data.results[random].id)
+      if (res.length == 0) {
+        return undefined;
+      }
+      await this.getMovieCredits(res[random].id)
         .then((response) => {
           console.log(response.data.id);
           for (let i = 0; i < response.data.crew.length; i++) {
@@ -214,28 +227,20 @@ module.exports = {
               response.data.crew[i].job == "Director" &&
               response.data.crew[i].name.toLowerCase().includes(dir)
             ) {
-              console.log(response.data.crew[i].name + " is the director!!!");
               isDirector = true;
-              result = res.data.results[random];
-              //countDir++;
+              result = res[random];
               isCorrect = true;
               break;
-            } //else {
-            //res.data.results.splice(random - 1, 1);
-            //}
+            }
           }
         })
         .catch((err) => {
           console.error(err);
         });
       if (!isDirector) {
-        res.data.results.splice(random, 1);
+        res.splice(random, 1);
       }
-      //random = Math.floor(Math.random() * res.data.results.length);
-      console.log(res.data.results.length);
     }
-
-    //console.log(results);
     return result;
   },
   // getMovieByYear: function (year) {
