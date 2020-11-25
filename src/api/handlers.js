@@ -9,12 +9,12 @@ const {
 require("dotenv").config();
 
 module.exports = {
-  errorMsg: function (agent) {
+  errorMsg: function (agent, msg) {
     agent.add(
       new Payload(
         agent.TELEGRAM,
         {
-          text: "<i>Houston, we have a problem 😔</i>",
+          text: "<i>" + msg + "</i>",
           parse_mode: "html",
         },
         { sendAsMessage: true }
@@ -81,7 +81,7 @@ module.exports = {
       .getMovie(agent.context.get("movie_request-followup").parameters, 1)
       .then(async (res) => {
         if (res == undefined) {
-          module.exports.errorMsg(agent)
+          module.exports.errorMsg(agent, "Houston, we have a problem 😔")
         }
         else {
           var results = res.data.results
@@ -105,6 +105,7 @@ module.exports = {
                 .catch(err => { console.error(err) });
             }
           }
+          console.log(results.length)
           if (results.length !== 0) {
             let random = Math.floor(Math.random() * results.length);
             var film = results[random];
@@ -154,10 +155,10 @@ module.exports = {
               agent.add(agent.request_.body.queryResult.fulfillmentText);
             }
             else {
-              module.exports.errorMsg(agent)
+              module.exports.errorMsg(agent, "Houston, we have a problem 😔")
             }
           } else {
-            module.exports.errorMsg(agent)
+            module.exports.errorMsg(agent, "No results found! Try another search 🙂")
           }
         }
       });

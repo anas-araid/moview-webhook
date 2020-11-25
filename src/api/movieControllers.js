@@ -144,10 +144,12 @@ module.exports = {
     var genres = "&with_genres=";
     await this.getGenres()
       .then((res) => {
+        console.log(res.data)
         for (let i = 0; i < params.genre.length; i++) {
           var genreName =
             params.genre[i].charAt(0).toUpperCase() +
             params.genre[i].substring(1);
+          genreName = this.titleCase(genreName)
           for (let x = 0; x < res.data.genres.length; x++) {
             if (genreName === res.data.genres[x].name) {
               genres += res.data.genres[x].id + ",";
@@ -190,6 +192,10 @@ module.exports = {
     if (params.language != "" && language == "&with_original_language=") {
       return undefined
     }
+    if (year == "&primary_release_year=" && decade == "&primary_release_date.gte=&primary_release_date.lte=") {
+      var tmp = new Date()
+      decade += (tmp.getFullYear() + "-" + (tmp.getMonth() + 1 < 10 ? '0' + (tmp.getMonth() + 1) : tmp.getMonth() + 1) + "-" + (tmp.getDate() < 10 ? '0' + tmp.getDate() : tmp.getDate()));
+    }
     var query =
       actors +
       keywords +
@@ -201,6 +207,16 @@ module.exports = {
       language;
     console.log(query);
     return query;
+  },
+  titleCase: function (str) {
+    var splitStr = str.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+      // You do not need to check if i is larger than splitStr length, as your for does that for you
+      // Assign it back to the array
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+    }
+    // Directly return the joined string
+    return splitStr.join(' ');
   },
   getMovieCredits: function (id) {
     return axios.get(
