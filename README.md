@@ -2,7 +2,7 @@
 
 1. scaricare o clonare il progetto **https://github.com/asdf1899/moview-webhook.git**
 2. nella root del progetto creare un file .env
-3. dentro il file .env aggiungere l'api key di tmdb (in questo modo **TMDB_KEY=api_key_di_tmdb**) e la porta di rete (**PORT=8080**)
+3. dentro il file .env aggiungere l'api key di tmdb (in questo modo **TMDB_KEY=api_key_di_tmdb**), la porta di rete (**PORT=8080**) e **JSON_BIN_NUMBER=api_key_di_extendsclass**
 4. eseguire il comando **npm install**
 5. creare un branch col tuo nome es. *moview_mario*
 6. per far partire il progetto eseguire **node src/index.js** oppure **npm run start**
@@ -55,13 +55,7 @@ Se si è stati aggiunti come contributor in heroku, per pubblicare una nuova ver
 I log del server si possono consulare o sulla dashboard di heroku sul sito, oppure direttamente dal terminale, utilizzando il comando *heroku logs --tail*
 
 
-## to-do
-
-- capire come inviare più immagini in una sola volta
-- dentro handlers, per ogni intent aggiungere la lista delle risposte (citazioni) ed inviare una a caso (handlers.js)
-- controllare che l'immagine ricevuta dall'api di tmdb non sia *null*
-- aggiungere la durata del film nella response
-- aggiungere il test del help
+<br>
 
 Visto che non c'è documentazione per dialogflow fullfillment (nodejs), conviene cercarsi le robe che servono direttamente all'interno della [libreria](https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/src) su Github
 
