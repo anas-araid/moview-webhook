@@ -1,4 +1,29 @@
-# moview
+<div align="center">
+  <h1>moview</h1>
+  <p>An open source movie recommendation bot for Telegram.</p>
+  <img src="https://anasaraid.me/hosting/moview/moview_logo.png" alt="logo" align="center" width="170px" />
+</div>
+
+#### tech stack
+
+  - [ExpressJS](https://vuejs.org/)
+  - [Dialogflow library](https://github.com/dialogflow/dialogflow-fulfillment-nodejs)
+  - [TMDB api](https://developers.themoviedb.org/3/getting-started/introduction)
+
+####
+
+With [moview](https://t.me/moview_chatbot) you can ask for a movie of a certain:
+- actor
+- director
+- genre
+- year
+- language
+etc.
+
+For example: *"give me a comedy movie from 2010"*
+
+
+### Getting Started
 
 1. scaricare o clonare il progetto **https://github.com/asdf1899/moview-webhook.git**
 2. nella root del progetto creare un file .env
@@ -12,7 +37,7 @@
 6. rendi il server temporaneamente online (**ngrok http 8080**)
 7. copiare l'url di ngrok (la versione https) in "webhook" nella sezione Fulfillment di Dialogflow
 
-## structure
+### Structure
 
 - node_modules -----------------------(librerie) 
 - src
@@ -25,7 +50,7 @@
 - .env ------------------------------------(variabili d'ambiente)
 - .package.json --------------------------(configurazioni varie)
 
-## contribution
+### Contribution
 Premessa: non lavorare direttamente nel branch main, ma nel tuo branch *moview_nome*
 
 1. Prima di fare una [pull request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request), dal tuo branch (moview_nome), scaricare l'ultima versione del progetto usando il comando "**git pull origin main**"
@@ -41,7 +66,7 @@ Premessa: non lavorare direttamente nel branch main, ma nel tuo branch *moview_n
 
 <br>
 
-## deployment
+### Deployment
 
 Per pubblicare il progetto su heroku è consigliato utilizzare un branch a parte (per es. production), dove il codice è 'pulito' e non ci sono console.log() o altro codice che potrebbe 'sporcare' la console.
 
@@ -63,4 +88,11 @@ Visto che non c'è documentazione per dialogflow fullfillment (nodejs), conviene
 
 <br>
 
-Se ci sono problemi scrivetemi su [telegram](https://t.me/asdf1899).
+
+### Authors
+
+- [Anas Araid](https://www.github.com/asdf1899)
+- [Valentino Frasnelli](https://www.github.com/valefras)
+- [Lorenzo Bocchi](https://www.github.com/bocchilorenzo)
+- [Erich Robbi](https://www.github.com/erich-r)
+- [Nicola Pasqualini](https://www.github.com/kkwego)

@@ -10,7 +10,7 @@ const TMDB_KEY = process.env.TMDB_KEY;
 
 module.exports = {
   LANGS: JSON.parse(fs.readFileSync('./src/api/data/langs.json', 'utf8')),
-  // restituisce un film casuale
+  // restituisce un film casuale -- FUNZIONE OBSOLETA
   getRandomMovie: function () {
     // random tra il 1935 e l'anno corrente
     let fistYear = 1935;
