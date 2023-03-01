@@ -91,8 +91,8 @@ Visto che non c'è documentazione per dialogflow fullfillment (nodejs), conviene
 
 ### Authors
 
-- [Anas Araid](https://www.github.com/asdf1899)
+- [Anas Araid](https://www.github.com/anas-araid)
 - [Valentino Frasnelli](https://www.github.com/valefras)
 - [Lorenzo Bocchi](https://www.github.com/bocchilorenzo)
 - [Erich Robbi](https://www.github.com/erich-r)
-- [Nicola Pasqualini](https://www.github.com/kkwego)
+- [Nicola Pasqualini](https://www.github.com/nicolapasqua99)
